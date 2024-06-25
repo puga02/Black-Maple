@@ -1,0 +1,175 @@
+###### SCRIPT BLACK MAPLE
+
+#### Preprocessing and alignment
+
+for f in fastqs/*R1.fq.gz; do
+    sample=`basename $f _R1.fq.gz`
+    echo "Trimming $sample"
+    fastp -i fastqs/${sample}_R1.fq.gz -I fastqs/${sample}_R2.fq.gz \
+          -o trimmed/${sample}_trimmed_R1.fq.gz \
+          -O trimmed/${sample}_trimmed_R2.fq.gz \
+          -w 24 -p -c -l 20 -M 30 -r --detect_adapter_for_pe \ ## short and low quality reads are discarded of the analyses
+          -h trimmed/${sample}_trimming.html \
+          -j trimmed/${sample}_trimming.json -V
+    bwa mem -t 24 -R "@RG\tID:${sample}\tSM:${sample}" \ ## alignment
+            reference/Aesc.1_0.fa.gz \
+            trimmed/${sample}_trimmed_R1.fq.gz \
+            trimmed/${sample}_trimmed_R2.fq.gz |
+            samtools sort -n -O sam - | samtools fixmate -m -O bam - - |
+            samtools sort -O bam - | samtools view -h -b -f 3 - > \
+            mapping/${sample}.mapped.sorted.concordant.bam
+    bamtools index -in mapping/${sample}.mapped.sorted.concordant.bam
+done
+
+#### Compute alignment statistics
+
+for f in mapping/*.bam;
+        do sample=`basename $f .bam`
+        echo "stats on $sample "
+        samtools flagstats $f > bamstats/$sample.stats
+done
+cd bamstats/
+echo -e "sample\ttotal\tproperly_paired\tmapped\tduplicates\tsupp" > bamstats.txt
+for f in *.stats; do
+        sample=`basename $f .mapped.sorted.concordant.stats`
+        total=`awk '{print $1}' $f | sed '1q;d'`
+        paired=`awk '{print $1}' $f | sed '12q;d'`
+        mapped=`awk '{print $1}' $f | sed '7q;d'`
+        duplicates=`awk '{print $1}' $f | sed '5q;d'`
+        supp=`awk '{print $1}' $f | sed '4q;d'`
+        echo -e "$sample\t$total\t$paired\t$mapped\t$duplicates\t$supp" >> bamstats.txt
+done
+
+#### Variant calling   
+
+ref_map.pl --samples mapping/ --popmap ERN_nohybs_popmap.txt -o stacks -X populations:"-p 5 -r 0.85 --fstats --write-random-snp --vcf"
+
+#### Calculate genotyping error rates
+### applying different maf filters on unfiltered VCF outputed from stacks
+vcftools --vcf stacks/populations.snps.vcf --maf 0.05 --out genotyping_error/populations.random_snps.maf005 --recode --remove-filtered-all
+vcftools --vcf stacks/populations.snps.vcf --maf 0.01 --out genotyping_error/populations.random_snps.maf001 --recode --remove-filtered-all
+vcftools --vcf stacks/populations.snps.vcf --maf 0.005 --out genotyping_error/populations.random_snps.maf0005 --recode --remove-filtered-all
+vcftools --vcf stacks/populations.snps.vcf --maf 0.001 --out genotyping_error/populations.random_snps.maf0001 --recode --remove-filtered-all
+
+### Genotyping_error.txt contains list of replicated individuals
+cd genotyping_error/
+mkdir maf005
+mkdir maf001
+mkdir maf0005
+mkdir maf0001
+
+split -l 2 genotyping_error.txt
+### when spliting list of replicates it creates documents called xaa, xab, ... with pairs of replicated individuals 
+
+for i in x*; do vcftools --vcf populations.random_snps.maf005.recode.vcf --keep $i --out $i.random_snps.maf005 --recode --remove-filtered-all; done
+for i in x*.random_snps.maf005.recode.vcf; do vcftools --vcf $i --extract-FORMAT-info GT --out $i; done
+for i in x*.random_snps.maf005.recode.vcf.GT.FORMAT; do awk '{ if ($3 == $4) { print "same"; } else { print "different"; } }' $i > $i.diff; done
+mkdir maf005
+mv x*.random_snps.maf005* maf005/
+
+for i in x*; do vcftools --vcf populations.random_snps.maf001.recode.vcf --keep $i --out $i.random_snps.maf001 --recode --remove-filtered-all; done
+for i in x*.random_snps.maf001.recode.vcf; do vcftools --vcf $i --extract-FORMAT-info GT --out $i; done
+for i in x*.random_snps.maf001.recode.vcf.GT.FORMAT; do awk '{ if ($3 == $4) { print "same"; } else { print "different"; } }' $i > $i.diff; done
+mkdir maf001
+mv x*.random_snps.maf001* maf001/
+
+for i in x*; do vcftools --vcf populations.random_snps.maf0005.recode.vcf --keep $i --out $i.random_snps.maf0005 --recode --remove-filtered-all; done
+for i in x*.random_snps.maf0005.recode.vcf; do vcftools --vcf $i --extract-FORMAT-info GT --out $i; done
+for i in x*.random_snps.maf0005.recode.vcf.GT.FORMAT; do awk '{ if ($3 == $4) { print "same"; } else { print "different"; } }' $i > $i.diff; done
+mkdir maf0005
+mv x*.random_snps.maf0005* maf0005/
+
+for i in x*; do vcftools --vcf populations.random_snps.maf0001.recode.vcf --keep $i --out $i.random_snps.maf0001 --recode --remove-filtered-all; done
+for i in x*.random_snps.maf0001.recode.vcf; do vcftools --vcf $i --extract-FORMAT-info GT --out $i; done
+for i in x*.random_snps.maf0001.recode.vcf.GT.FORMAT; do awk '{ if ($3 == $4) { print "same"; } else { print "different"; } }' $i > $i.diff; done
+mkdir maf0001
+mv x*.random_snps.maf0001* maf0001/
+
+#### Filters
+
+vcftools --vcf genotyping_error/populations.random_snps.maf0001.recode.vcf --min-meanDP 20 --out filters/ern.random_snps.maf0001.DP20 --recode --remove-filtered-all
+vcftools --vcf filters/ern.random_snps.maf0001.DP20.recode.vcf --max-meanDP 500 --out filters/ern.random_snps.maf0001.DP20-500 --recode --remove-filtered-all
+vcftools --vcf filters/ern.random_snps.maf0001.DP20.recode.vcf --max-missing 0.95 --out filters/ern.random_snps.maf0001.DP20.miss5 --recode --remove-filtered-all
+vcftools --vcf filters/ern.random_snps.maf0001.DP20.miss5.recode.vcf --missing-indv --out filters/ern.random_snps.maf0001.DP20.miss5
+awk -F"\t" '$5>0.05' filters/ern.random_snps.maf0001.DP20.miss5.imiss | cut -f 1 | sed '1d' > filters/exclude.txt
+vcftools --vcf filters/ern.random_snps.maf0001.DP20.miss5.recode.vcf --remove filters/exclude.txt --out ern.random_snps.filt --recode --remove-filtered-all
+
+#### Pruning
+
+## making chrom map file for plink conversion (because plink will change name of chromosoms, I choose that it uses those that I want)
+rm -v chrom*
+bcftools query -f '%CHROM\n' ern.random_snps.filt.recode.vcf > chrom.random_snps.filt.txt
+grep acsa chrom.random_snps.filt.txt | uniq > chrom.random_snps.filt.list
+a=0
+for i in `cat chrom.random_snps.filt.list`; do a=$((a+1)); echo -e "$i\t$a" >> chrom.random_snps.filt_map; done
+
+## Convert to PLINK raw format
+vcftools --vcf ern.random_snps.filt.recode.vcf --out pruning/ern.random_snps.filt --plink --chrom-map chrom.random_snps.filt_map
+
+## prune linked snps
+plink --file pruning/ern.random_snps.filt --indep-pairwise 50 10 0.1 --allow-extra-chr --out pruning/plink-prune
+plink --file pruning/ern.random_snps.filt --extract pruning/plink-prune.prune.in --make-bed --out pruning/ern.random_snps.filt.prun --allow-extra-chr
+
+#### remove replicated individuals
+## extract pruned positions of initial vcf(take data.prun.bim and in EXCEL make correspondance between chrom numbers with chrom map and extract right chrom name with positions and convert it to txt)
+vcftools --vcf ern.random_snps.filt.recode.vcf --positions pruning/ern.random_snps.filt.pruned.pos.txt --out ern.random_snps.filt.prun --recode --remove-filtered-all
+
+## get imiss data to indentify replicates to keep
+vcftools --vcf ern.random_snps.filt.prun.recode.vcf --missing-indv --out ern.random_snps.filt.prun
+## from imiss created after_pruning choose which replicate to exclude (with more missingness), create a list remove.txt
+vcftools --vcf ern.random_snps.filt.prun.recode.vcf --remove remove.txt --out final_data/ern.random_snps.filt.prun.norep --recode --remove-filtered-all 
+
+#### Creating final data
+### for all individuals
+## from final vcf create bed files and raw file
+## making chrom map file for plink conversion (because plink will change name of chromosoms, I choose that it uses those that I want)
+rm -v chrom*
+bcftools query -f '%CHROM\n' final_data/ern.snps.str-input.prun.norep.recode.vcf > chrom.txt
+grep acsa chrom.txt | uniq > chrom_list
+a=0
+for i in `cat chrom_list`; do a=$((a+1)); echo -e "$i\t$a" >> chrom_map; done
+
+## Convert to PLINK format and make BED
+vcftools --vcf final_data/ern.random_snps.filt.prun.norep.recode.vcf --out final_data/ern.random_snps.filt.prun.norep --plink --chrom-map chrom.random_snps.filt_map
+plink --file final_data/ern.random_snps.filt.prun.norep --make-bed --out final_data/ern.random_snps.filt.prun.norep --allow-extra-chr
+## convert plink format to raw format
+plink --bfile final_data/ern.random_snps.filt.prun.norep --recode A --out final_data/ern.random_snps.filt.prun.norep --allow-extra-chr
+
+### Extract sugar maple individuals 
+vcftools --vcf final_data/ern.random_snps.filt.prun.norep.recode.vcf --keep sugars.txt --out final_data/sugars.random_snps.filt.prun.norep --recode --remove-filtered-all
+## Convert to PLINK format and make BED
+vcftools --vcf final_data/sugars.random_snps.filt.prun.norep.recode.vcf --out final_data/sugars.random_snps.filt.prun.norep --plink --chrom-map chrom.random_snps.filt_map
+plink --file final_data/sugars.random_snps.filt.prun.norep --make-bed --out final_data/sugars.random_snps.filt.prun.norep --allow-extra-chr
+## convert plink format to raw format
+plink --bfile final_data/sugars.random_snps.filt.prun.norep --recode A --out final_data/sugars.random_snps.filt.prun.norep --allow-extra-chr
+
+### Extract black maple individuals 
+vcftools --vcf final_data/ern.random_snps.filt.prun.norep.recode.vcf --keep blacks.txt --out final_data/blacks.random_snps.filt.prun.norep --recode --remove-filtered-all
+## Convert to PLINK format and make BED
+vcftools --vcf final_data/blacks.random_snps.filt.prun.norep.recode.vcf --out final_data/blacks.random_snps.filt.prun.norep --plink --chrom-map chrom.random_snps.filt_map
+plink --file final_data/blacks.random_snps.filt.prun.norep --make-bed --out final_data/blacks.random_snps.filt.prun.norep --allow-extra-chr
+## convert plink format to raw format
+plink --bfile final_data/blacks.random_snps.filt.prun.norep --recode A --out final_data/blacks.random_snps.filt.prun.norep --allow-extra-chr
+
+#### Compute statistics on final VCFs
+IN_DIR=final_data
+OUT_DIR=vcf-stats
+for i in $IN_DIR/*.recode.vcf
+do
+        name=`basename $i .recode.vcf`
+        vcftools --vcf $i --depth --out $OUT_DIR/$name
+        vcftools --vcf $i --site-mean-depth --out $OUT_DIR/$name
+        vcftools --vcf $i --het --out $OUT_DIR/$name
+	vcftools --vcf $i --site-pi --out $OUT_DIR/$name
+        
+done
+
+### STRUCTURE 
+## vcf file with all individuals genotypes for filtered and pruned SNPs was converted into STRUCTURE input format using PGDspider (Lischer and Excoffier, 2012) 
+## Lischer, H. E. L., et L. Excoffier. 2012. « PGDSpider: an automated data conversion tool for connecting population genetics and genomics programs ». Bioinformatics 28 (2): 298‑99. https://doi.org/10.1093/bioinformatics/btr642.
+## run bash script for looping structure over k values and repetitions
+## ensure to have mainparams and extraparams files in the same folder
+structure_batch.sh ern.random_snps.filt.prun.norep 1 9 10 5
+
+
+### See RMarkdown "black maple.Rmd" for other analyses 

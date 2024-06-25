@@ -1,0 +1,370 @@
+---
+title: "Is black maple a separate species ?"
+author: "Alix Pugeaut"
+date: "2023-07-24"
+output: html_document
+---
+
+```{r setup}
+setwd("C:/Users/client/Documents/ISFORT/Doc/Articles/ERN")
+library(adegenet)
+library(ade4)
+library(dartR)
+library(factoextra)
+library(geosphere)
+library(ggplot2)
+library(ggpubr)
+library(hierfstat)
+library(reshape2)
+library(vegan)
+print(sessionInfo())
+```
+
+## Load raw file into genind file
+```{r raw}
+ern.gl=read.PLINK("final_data/ern.random_snps.filt.prun.norep.raw")
+##ouvrir les metadatas = fichier .fam modifié (ajouter POP LAT LONG SP, enregistrer en txt)
+pops=read.delim("final_data/ern.random_snps.filt.prun.norep.fam.txt", header=T)
+pops$POP=as.factor(pops$POP)
+pop(ern.gl)=pops$POP
+indNames(ern.gl)=pops$ID
+strata(ern.gl)=pops
+hier(ern.gl)=~SP/POP/ID
+
+ern.gi=gl2gi(ern.gl)
+strata(ern.gi)=pops
+hier(ern.gi)=~SP/POP/ID
+
+```
+
+## Subset
+```{r subsets}
+summary(ern.gi@pop)
+byPop = seppop(ern.gi)
+Kenauk.gi=repool(byPop$`Fasset 1`, byPop$`Fasset 2`, byPop$`Fasset 3`, byPop$`Fasset 4`, byPop$`Fasset 5`, byPop$`Fasset 6`)
+blacks.gi=repool(byPop$`Fasset 1`,byPop$`Fasset 4`,byPop$`Deux-Montagnes`)
+sugars.gi=repool(byPop$`Fasset 2`, byPop$`Fasset 3`, byPop$`Fasset 5`, byPop$`Fasset 6`, byPop$`Sainte-Anne-du-Lac`, byPop$`Fjord-Saguenay`)
+```
+
+## Basic stats
+```{r stats, echo=FALSE}
+
+##### HETEROZYGOSITY
+## avant d'ouvrir le fichier het rajouter colonnes POP et SP
+ind_het=read.delim("vcf-stats/ern.random_snps.filt.prun.norep.het.txt", header=T)
+blacks=as.vector(blacks.gi@strata[["ID"]])
+sugars=as.vector(sugars.gi@strata[["ID"]])
+## het per species
+het_blacks <- ind_het[ind_het$INDV %in% blacks, ] 
+het_sugars <- ind_het[ind_het$INDV %in% sugars, ] 
+
+## Test Ho
+shapiro.test(het_blacks$Ho)
+shapiro.test(het_sugars$Ho)
+t.test(het_blacks$Ho,het_sugars$Ho)
+
+## Test He
+shapiro.test(het_blacks$He)
+shapiro.test(het_sugars$He)
+t.test(het_blacks$He,het_sugars$He)
+
+## Test F
+shapiro.test(het_blacks$F)
+shapiro.test(het_sugars$F)
+t.test(het_blacks$F,het_sugars$F)
+t.test(het_blacks$Verif_F,het_sugars$Verif_F)
+
+##### PI
+## read vcftools output for each morphospecies
+blacks_pi=read.delim("vcf-stats/blacks.random_snps.filt.prun.norep.sites.pi", header=T)
+sugars_pi=read.delim("vcf-stats/sugars.random_snps.filt.prun.norep.sites.pi", header=T)
+head(blacks_pi)
+head(sugars_pi)
+
+## verify it's the same positions for each morphospecies
+identical(blacks_pi$POS, sugars_pi$POS)
+
+## Test Pi
+shapiro.test(blacks_pi$PI)
+shapiro.test(sugars_pi$PI)
+t.test(blacks_pi$PI, sugars_pi$PI)
+
+## create new dataframe for easier plotting
+pi_plot=cbind(blacks_pi$POS, blacks_pi$PI, sugars_pi$PI)
+pi_plot=as.data.frame(pi_plot)
+pi_plot <- pi_plot %>% rename(POS=V1,Black=V2, Sugar=V3)
+rownames(pi_plot)=pi_plot$POS
+pi_plot=stack(pi_plot[,-1])
+pi_plot <- pi_plot %>% rename(PI=values, SP=ind)
+ggplot(pi_plot, aes(PI, color=as.factor(SP)))+geom_histogram()
+
+A=ggboxplot(ind_het, x="SP", y="He", color="SP",add="jitter", shape="SP")+ scale_color_manual(values=c("#010100","#b5b5b3"))+ scale_shape_manual(values=c(15,16))
+A
+B=ggboxplot(ind_het, x="SP", y="Ho", color="SP",add="jitter", shape="SP")+scale_color_manual(values=c("#010100","#b5b5b3"))+ scale_shape_manual(values=c(15,16))
+C=ggboxplot(ind_het, x="SP", y="F", color="SP",add="jitter", shape="SP")+scale_color_manual(values=c("#010100","#b5b5b3"))+ scale_shape_manual(values=c(15,16))
+D=ggboxplot(pi_plot, x = "SP", y = "values", color = "SP",add = "jitter", shape="SP")+ scale_color_manual(values=c("#010100","#b5b5b3"))+ scale_shape_manual(values=c(15,16))
+D
+plot_grid(A,B,C,D, labels = c('A', 'B', 'C', 'D'), label_size = 12)
+ggarrange(A,B,C,D, labels = c('A', 'B', 'C', 'D'), ncol = 2, nrow = 2)
+plot_grid(B,C, labels = c('A', 'B'), label_size = 12)
+```
+
+## STRUCTURE 
+
+PCA
+```{r pca, echo=FALSE}
+# Replace missing data with the mean allele frequencies
+x2 = tab(Kenauk.gi, NA.method = "mean")
+pca2 = dudi.pca(x2, scannf = FALSE, scale = FALSE, nf = 10)
+eigs2=get_eig(pca2)
+sample_data <- read.csv("database/Coords_kenauk.csv", header = TRUE, sep = ";")
+library(oce)
+UTM=lonlat2utm(sample_data$LONG, sample_data$LAT, km = FALSE)
+sample_data$UTM_E=UTM$easting
+sample_data$UTM_N=UTM$northing
+svg("map_kenauk_UTM.svg")
+ggplot() + geom_point(data=sample_data, aes(x=UTM_E, y=UTM_N, shape=POP, colour=SP), size=4, stroke=1) +
+  scale_shape_manual(values=c(0, 1, 8, 5, 10, 13)) +
+  scale_color_manual(values=c("#b5b5b3","#010100")) +
+  scale_size_manual(values=10)+
+  theme_classic(base_line_size = 1, base_size=12) +
+  theme(legend.position = "right", legend.spacing.y = unit(1, "cm"), legend.key.size = unit(1, "cm")) +
+  guides(fill = guide_legend(byrow = TRUE))
+dev.off()
+
+svg("pca_kenauk.svg")
+fviz_pca_ind(pca2, geom.ind="points") +
+  geom_point(aes(color=as.factor(Kenauk.gi@strata$SP), shape=as.factor(Kenauk.gi$strata$POP)), size=4, stroke=1) +
+  scale_shape_manual(values=c(0, 1, 8, 5, 10, 13)) +
+  scale_color_manual(values=c("#b5b5b3","#010100")) +
+  theme_classic(base_line_size = 1, base_size=12) +
+  theme(legend.position = "right", legend.spacing.y = unit(1, "cm"), legend.key.size = unit(1, "cm")) +
+  guides(fill = guide_legend(byrow = TRUE))
+dev.off()
+
+x = tab(ern.gi, NA.method = "mean")
+pca1 = dudi.pca(x, scannf = FALSE, scale = FALSE, nf = 10)
+eigs=get_eig(pca1)
+write.table(eigs, "str-input/eigs.txt")
+fviz_eig(pca1)
+var_pca1=get_pca_var(pca1)
+contrib_var_pca1=var_pca1[["contrib"]]
+write.table(contrib_var_pca1, "str-input/contrib_var_pca1.txt")
+
+svg("pca_all.svg")
+fviz_pca_ind(pca1, geom.ind="points") +
+  geom_point(aes(color=as.factor(ern.gi@strata$SP), shape=as.factor(ern.gi$strata$POP)), size=4, stroke=1)+
+  scale_shape_manual(values=c(15, 16, 20, 0, 1, 8, 5, 10, 13)) +
+  scale_color_manual(values=c("#b5b5b3","#010100")) +
+  theme_classic(base_line_size = 1, base_size=12) +
+  theme(legend.position = "right", legend.spacing.y = unit(1, "cm"), legend.key.size = unit(1, "cm")) +
+  guides(fill = guide_legend(byrow = TRUE))
+dev.off()
+
+
+```
+
+STRUCTURE was run for 9 K, which is the number of natural populations. 
+```{r structure, echo=FALSE}
+## Pophelper strategy
+library(pophelper)
+setwd("C:/Users/client/Documents/ISFORT/Doc/Articles/ERN/str-random_snps-ern")
+
+K2_list=c("str-random_snps-ern/ern.random_snps.filt.prun-K2-1_f","str-random_snps-ern/ern.random_snps.filt.prun-K2-2_f","str-random_snps-ern/ern.random_snps.filt.prun-K2-3_f","str-random_snps-ern/ern.random_snps.filt.prun-K2-4_f","str-random_snps-ern/ern.random_snps.filt.prun-K2-5_f","str-random_snps-ern/ern.random_snps.filt.prun-K2-6_f","str-random_snps-ern/ern.random_snps.filt.prun-K2-7_f","str-random_snps-ern/ern.random_snps.filt.prun-K2-8_f","str-random_snps-ern/ern.random_snps.filt.prun-K2-9_f", "str-random_snps-ern/ern.random_snps.filt.prun-K2-10_f")
+K2_Q=readQ(files = K2_list, filetype = "structure", indlabfromfile = TRUE, readci = FALSE)
+K2_tab=tabulateQ(K2_Q)
+K2_clumpp=alignK(K2_Q, type="auto")
+write.table(K2_clumpp, "str-random_snps-ern/output_pophelper_K2.txt")
+## manipulations of output pophelper in EXCEL to have the mean value for each cluster per ind, add SP column and sort according to SP
+K2=read.delim("str-random_snps-ern/output_pophelper_K2_mean_clean.txt", header = TRUE, sep="\t")
+rownames(K2)=ern.gi@strata[["ID"]]
+K2 <- K2[order(K2$SP),]
+K2matrix=K2[,-1:-2] 
+K2matrix=as.matrix(K2matrix)
+
+compoplot(K2matrix, space = 0, show.lab = 1, cex.names = 1,
+          col.pal = c("#254155","#daab02"), posi = 'bottom',main = 'Admixture, K=2')
+
+## test of admixture
+kenauk=as.vector(Kenauk.gi@strata[["ID"]])
+K2_kenauk <- K2[rownames(K2) %in% kenauk, ]
+K2_kenauk_black <- K2_kenauk[rownames(K2_kenauk) %in% blacks, ]
+K2_kenauk_sugar <- K2_kenauk[rownames(K2_kenauk) %in% sugars, ]
+
+
+K3_list=c("str-random_snps-ern/ern.random_snps.filt.prun-K3-1_f","str-random_snps-ern/ern.random_snps.filt.prun-K3-2_f","str-random_snps-ern/ern.random_snps.filt.prun-K3-3_f","str-random_snps-ern/ern.random_snps.filt.prun-K3-4_f","str-random_snps-ern/ern.random_snps.filt.prun-K3-5_f","str-random_snps-ern/ern.random_snps.filt.prun-K3-6_f","str-random_snps-ern/ern.random_snps.filt.prun-K3-7_f","str-random_snps-ern/ern.random_snps.filt.prun-K3-8_f","str-random_snps-ern/ern.random_snps.filt.prun-K3-9_f", "str-random_snps-ern/ern.random_snps.filt.prun-K3-10_f")
+K3_Q=readQ(files = K3_list, filetype = "structure", indlabfromfile = TRUE, readci = FALSE)
+K3_tab=tabulateQ(K3_Q)
+K3_clumpp=alignK(K3_Q, type="auto")
+write.table(K3_clumpp, "str-random_snps-ern/output_pophelper_K3.txt")
+## manipulations of output pophelper in EXCEL to have the mean value for each cluster per ind, add SP column and sort according to SP
+K3=read.delim("str-random_snps-ern/output_pophelper_K3_mean_clean.txt", header = TRUE, sep="\t")
+rownames(K3)=K3$IND
+K3 <- K3[order(K3$SP),]
+K3matrix=K3[,-1:-2] 
+K3matrix=as.matrix(K3matrix)
+
+compoplot(K3matrix, space = 0, show.lab = 1, cex.names = 1,
+          col.pal = c("#525FCE","#254155","#daab02"), posi = 'bottom',main = 'Admixture, K=3')
+
+K4_list=c("str-random_snps-ern/ern.random_snps.filt.prun-K4-1_f","str-random_snps-ern/ern.random_snps.filt.prun-K4-2_f","str-random_snps-ern/ern.random_snps.filt.prun-K4-3_f","str-random_snps-ern/ern.random_snps.filt.prun-K4-4_f","str-random_snps-ern/ern.random_snps.filt.prun-K4-5_f","str-random_snps-ern/ern.random_snps.filt.prun-K4-6_f","str-random_snps-ern/ern.random_snps.filt.prun-K4-7_f","str-random_snps-ern/ern.random_snps.filt.prun-K4-8_f","str-random_snps-ern/ern.random_snps.filt.prun-K4-9_f", "str-random_snps-ern/ern.random_snps.filt.prun-K4-10_f")
+K4_Q=readQ(files = K4_list, filetype = "structure", indlabfromfile = TRUE, readci = FALSE)
+K4_tab=tabulateQ(K4_Q)
+K4_clumpp=alignK(K4_Q, type="auto")
+write.table(K4_clumpp, "str-random_snps-ern/output_pophelper_K4.txt")
+## manipulations of output pophelper in EXCEL to have the mean value for each cluster per ind, add SP column and sort according to SP
+K4=read.delim("str-random_snps-ern/output_pophelper_K4_mean_clean.txt", header = TRUE, sep="\t")
+rownames(K4)=K4$IND
+K4 <- K4[order(K4$SP),]
+K4matrix=K4[,-1:-2] 
+K4matrix=as.matrix(K4matrix)
+
+compoplot(K4matrix, space = 0, show.lab = 1, cex.names = 1,
+          col.pal = c("#525FCE","#daab02","#00A35C","#254155"), posi = 'bottom',main = 'Admixture, K=4')
+
+K5_list=c("str-random_snps-ern/ern.random_snps.filt.prun-K5-1_f","str-random_snps-ern/ern.random_snps.filt.prun-K5-2_f","str-random_snps-ern/ern.random_snps.filt.prun-K5-3_f","str-random_snps-ern/ern.random_snps.filt.prun-K5-4_f","str-random_snps-ern/ern.random_snps.filt.prun-K5-5_f","str-random_snps-ern/ern.random_snps.filt.prun-K5-6_f","str-random_snps-ern/ern.random_snps.filt.prun-K5-7_f","str-random_snps-ern/ern.random_snps.filt.prun-K5-8_f","str-random_snps-ern/ern.random_snps.filt.prun-K5-9_f", "str-random_snps-ern/ern.random_snps.filt.prun-K5-10_f")
+K5_Q=readQ(files = K5_list, filetype = "structure", indlabfromfile = TRUE, readci = FALSE)
+K5_tab=tabulateQ(K5_Q)
+K5_clumpp=alignK(K5_Q, type="auto")
+write.table(K5_clumpp, "str-random_snps-ern/output_pophelper_K5.txt")
+## manipulations of output pophelper in EXCEL to have the mean value for each cluster per ind, add SP column and sort according to SP
+K5=read.delim("str-random_snps-ern/output_pophelper_K5_mean_clean.txt", header = TRUE, sep="\t")
+rownames(K5)=K5$IND
+K5 <- K5[order(K5$SP),]
+K5matrix=K5[,-1:-2] 
+K5matrix=as.matrix(K5matrix)
+
+compoplot(K5matrix, space = 0, show.lab = 1, cex.names = 1,
+          col.pal = c("#525FCE","#00A35C","#00FA9A","#254155","#daab02"), posi = 'bottom',main = 'Admixture, K=5')
+
+K6_list=c("str-random_snps-ern/ern.random_snps.filt.prun-K6-1_f","str-random_snps-ern/ern.random_snps.filt.prun-K6-2_f","str-random_snps-ern/ern.random_snps.filt.prun-K6-3_f","str-random_snps-ern/ern.random_snps.filt.prun-K6-4_f","str-random_snps-ern/ern.random_snps.filt.prun-K6-5_f","str-random_snps-ern/ern.random_snps.filt.prun-K6-6_f","str-random_snps-ern/ern.random_snps.filt.prun-K6-7_f","str-random_snps-ern/ern.random_snps.filt.prun-K6-8_f","str-random_snps-ern/ern.random_snps.filt.prun-K6-9_f", "str-random_snps-ern/ern.random_snps.filt.prun-K6-10_f")
+K6_Q=readQ(files = K6_list, filetype = "structure", indlabfromfile = TRUE, readci = FALSE)
+K6_tab=tabulateQ(K6_Q)
+K6_clumpp=alignK(K6_Q, type="auto")
+write.table(K6_clumpp, "str-random_snps-ern/output_pophelper_K6.txt")
+## manipulations of output pophelper in EXCEL to have the mean value for each cluster per ind, add SP column and sort according to SP
+K6=read.delim("str-random_snps-ern/output_pophelper_K6_mean_clean.txt", header = TRUE, sep="\t")
+rownames(K6)=K6$IND
+K6 <- K6[order(K6$SP),]
+K6matrix=K6[,-1:-2] 
+K6matrix=as.matrix(K6matrix)
+
+compoplot(K6matrix, space = 0, show.lab = 1, cex.names = 1,
+          col.pal = c("#525FCE","#daab02","#254155","#00A35C","#00FA9A","#C34A2C"), posi = 'bottom',main = 'Admixture, K=6')
+
+K7_list=c("str-random_snps-ern/ern.random_snps.filt.prun-K7-1_f","str-random_snps-ern/ern.random_snps.filt.prun-K7-2_f","str-random_snps-ern/ern.random_snps.filt.prun-K7-3_f","str-random_snps-ern/ern.random_snps.filt.prun-K7-4_f","str-random_snps-ern/ern.random_snps.filt.prun-K7-5_f","str-random_snps-ern/ern.random_snps.filt.prun-K7-6_f","str-random_snps-ern/ern.random_snps.filt.prun-K7-7_f","str-random_snps-ern/ern.random_snps.filt.prun-K7-8_f","str-random_snps-ern/ern.random_snps.filt.prun-K7-9_f", "str-random_snps-ern/ern.random_snps.filt.prun-K7-10_f")
+K7_Q=readQ(files = K7_list, filetype = "structure", indlabfromfile = TRUE, readci = FALSE)
+K7_tab=tabulateQ(K7_Q)
+K7_clumpp=alignK(K7_Q, type="auto")
+write.table(K7_clumpp, "str-random_snps-ern/output_pophelper_K7.txt")
+## manipulations of output pophelper in EXCEL to have the mean value for each cluster per ind, add SP column and sort according to SP
+K7=read.delim("str-random_snps-ern/output_pophelper_K7_mean_clean.txt", header = TRUE, sep="\t")
+rownames(K7)=K7$IND
+K7 <- K7[order(K7$SP),]
+K7matrix=K7[,-1:-2] 
+K7matrix=as.matrix(K7matrix)
+
+compoplot(K7matrix, space = 0, show.lab = 1, cex.names = 1,
+          col.pal = c("#254167","#728FCE","#daab02","#00A36C","#00FA9A","#C34A2C","#FF7674"), posi = 'bottom',main = 'Admixture, K=7')
+
+K8_list=c("str-random_snps-ern/ern.random_snps.filt.prun-K8-1_f","str-random_snps-ern/ern.random_snps.filt.prun-K8-2_f","str-random_snps-ern/ern.random_snps.filt.prun-K8-3_f","str-random_snps-ern/ern.random_snps.filt.prun-K8-4_f","str-random_snps-ern/ern.random_snps.filt.prun-K8-5_f","str-random_snps-ern/ern.random_snps.filt.prun-K8-6_f","str-random_snps-ern/ern.random_snps.filt.prun-K8-7_f","str-random_snps-ern/ern.random_snps.filt.prun-K8-8_f","str-random_snps-ern/ern.random_snps.filt.prun-K8-9_f", "str-random_snps-ern/ern.random_snps.filt.prun-K8-10_f")
+K8_Q=readQ(files = K8_list, filetype = "structure", indlabfromfile = TRUE, readci = FALSE)
+K8_tab=tabulateQ(K8_Q)
+K8_clumpp=alignK(K8_Q, type="auto")
+write.table(K8_clumpp, "str-random_snps-ern/output_pophelper_K8.txt")
+## manipulations of output pophelper in EXCEL to have the mean value for each cluster per ind, add SP column and sort according to SP
+K8=read.delim("str-random_snps-ern/output_pophelper_K8_mean_clean.txt", header = TRUE, sep="\t")
+rownames(K8)=K8$IND
+K8 <- K8[order(K8$SP),]
+K8matrix=K8[,-1:-2] 
+K8matrix=as.matrix(K8matrix)
+
+compoplot(K8matrix, space = 0, show.lab = 1, cex.names = 1,
+          col.pal = c("#254167","#728FCE","#00FA9A","#00A36C","#E75480","#C34A2C","#daab02","#FF8674"), posi = 'bottom',main = 'Admixture, K=8')
+
+K9_list=c("ern.random_snps.filt.prun-K9-1_f","ern.random_snps.filt.prun-K9-2_f","ern.random_snps.filt.prun-K9-3_f","ern.random_snps.filt.prun-K9-4_f","ern.random_snps.filt.prun-K9-5_f","ern.random_snps.filt.prun-K9-6_f","ern.random_snps.filt.prun-K9-7_f","ern.random_snps.filt.prun-K9-8_f","ern.random_snps.filt.prun-K9-9_f", "ern.random_snps.filt.prun-K9-10_f")
+K9_Q=readQ(files = K9_list, filetype = "structure", indlabfromfile = TRUE, readci = FALSE)
+K9_tab=tabulateQ(K9_Q)
+K9_clumpp=alignK(K9_Q, type="auto")
+write.table(K9_clumpp, "output_pophelper_K9.txt")
+## manipulations of output pophelper in EXCEL to have the mean value for each cluster per ind, add SP column and sort according to SP
+K9=read.delim("str-random_snps-ern/output_pophelper_K9_mean_clean.txt", header = TRUE, sep="\t")
+rownames(K9)=K9$IND
+K9matrix=K9[,-1:-2] 
+K9matrix=as.matrix(K9matrix)
+
+
+compoplot(K9matrix, space = 0, show.lab = 1, cex.names = 1,
+          col.pal = c("#00A36C","#728FCE","#00FA9A","#254167","#E75480","#C34A2C","#daab02","#FF8674","#560319"), posi = 'bottom',
+          main = 'Admixture, K=9')
+
+```
+
+FST
+```{r FST, echo=FALSE}
+
+gl2genepop(ern.gl, outfile="ern.random_snps.filt.prun.norep.genepop", outpath="final_data",  pop_order = "alphabetic", output_format = "3_digits")
+
+## Modify genepop file obtained with command line with perl command line perl -pi -e 's/\r\n|\n|\r/\n/g' file.genepop
+
+fastDivPart(infile = "ern.random_snps.filt.prun.norep.genepop", outfile="fst_ern.random_snps.filt.prun.norep.genepop", fst = TRUE, bs_pairwise = TRUE, bs_locus=FALSE, pairwise = TRUE, boots = 1000, para = TRUE)
+
+## morphospecies binary matrix
+sp=read.table("morpho_binary.txt", sep="\t", header = TRUE)
+rownames(sp)=sp$X
+sp=sp[,-1]
+sp=as.matrix(sp)
+## fst matrix
+fst=read.table("fst.txt", sep="\t", header = TRUE)
+rownames(fst)=fst$X
+fst=fst[,-1]
+fst=as.matrix(fst)
+
+mantel(fst, sp, method = "spearman", permutations = 999, na.rm = TRUE)
+
+sp_local=sp[-1:-3,-1:-3]
+fst_local=fst[-1:-3,-1:-3]
+
+mantel(fst_local, sp_local, method = "spearman", permutations = 999, na.rm = TRUE)
+
+## plot FST vs binary appurtenance
+dist=read.csv("Mantel_test.csv", sep=";")
+
+ggboxplot(dist, x="Mantel", y="FST", add="jitter", shape="Mantel")+ scale_shape_manual(values=c(6,2))+theme_classic(base_line_size = 2,base_size=14)
+```
+
+
+## PCA bota
+```{r pca bota, echo=FALSE}
+## read bota matrix
+data=read.delim("./database/Bota_pca.txt", sep="\t")
+rownames(data)=data$POP
+bota=data[,-1:-2]
+ab <- table(unlist(bota))
+barplot(ab, las = 1, # make axis labels perpendicular to axis
+        xlab = "Abundance class", ylab = "Frequency", # label axes
+        col = grey(5:0/5)) # 5-colour gradient for the bars
+bota.rank <- decostand(bota, method = "rrank")
+
+
+bota.pca <- dudi.pca(bota.rank, scannf = FALSE, scale = FALSE)
+summary(bota.pca)
+var <- get_pca_var(bota.pca)
+contrib=var$contrib
+write.table(contrib, "bota_contrib.txt")
+
+fviz_pca_biplot(bota.pca, geom.ind = "points", repel = TRUE, select.var = list(contrib = 6), geom.var= c("arrow","text"), arrowsize=1, col.var="black", ) +
+  geom_point(aes(color=as.factor(data$SP), shape=as.factor(data$POP)), size=4, stroke=1) +
+ scale_shape_manual(values=c(0, 1, 8, 5, 10, 13)) +
+  scale_color_manual(values=c("#b5b5b3","#010100")) +
+  theme(legend.position = "right", legend.spacing.y = unit(1, "cm"), legend.key.size = unit(1, "cm")) +
+  guides(fill = guide_legend(byrow = TRUE))
+
+eigs=get_eig(bota.pca)
+tab_pca_bota=bota.pca[["tab"]]
+write.table(tab_pca_bota, "tab_pca_bota.txt")
+
+biplot(bota.pca, col = c("darkblue","black"), ylabs=rownames(contrib), xlabs = rep("*", 6))
+
+```
+
