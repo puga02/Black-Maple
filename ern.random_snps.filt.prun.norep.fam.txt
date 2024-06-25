@@ -1,0 +1,142 @@
+VCF-ID	ID	POP	LAT	LONG	SP	DATE
+QC2MON01.02.mapped.sorted.concordant	QC2MON01.02	Deux-Montagnes	45,5322	-73,89249	nigrum	2022-09-13
+QC2MON01.03.mapped.sorted.concordant	QC2MON01.03	Deux-Montagnes	45,53232	-73,89262	nigrum	2022-09-13
+QC2MON01.04.mapped.sorted.concordant	QC2MON01.04	Deux-Montagnes	45,53252	-73,89272	nigrum	2022-09-13
+QC2MON01.05.mapped.sorted.concordant	QC2MON01.05	Deux-Montagnes	45,53249	-73,89251	nigrum	2022-09-13
+QC2MON01.06.mapped.sorted.concordant	QC2MON01.06	Deux-Montagnes	45,53263	-73,89233	nigrum	2022-09-13
+QC2MON01.07.mapped.sorted.concordant	QC2MON01.07	Deux-Montagnes	45,53271	-73,89223	nigrum	2022-09-13
+QC2MON01.08.mapped.sorted.concordant	QC2MON01.08	Deux-Montagnes	45,53245	-73,89215	nigrum	2022-09-13
+QC2MON01.09.mapped.sorted.concordant	QC2MON01.09	Deux-Montagnes	45,5325	-73,89201	nigrum	2022-09-13
+QC2MON01.10.mapped.sorted.concordant	QC2MON01.10	Deux-Montagnes	45,53239	-73,89196	nigrum	2022-09-13
+QC2MON01.11.mapped.sorted.concordant	QC2MON01.11	Deux-Montagnes	45,53231	-73,89191	nigrum	2022-09-13
+QC2MON01.12.mapped.sorted.concordant	QC2MON01.12	Deux-Montagnes	45,5323	-73,89188	nigrum	2022-09-13
+QC2MON01.13.mapped.sorted.concordant	QC2MON01.13	Deux-Montagnes	45,53227	-73,89191	nigrum	2022-09-14
+QC2MON01.14.mapped.sorted.concordant	QC2MON01.14	Deux-Montagnes	45,53235	-73,89192	nigrum	2022-09-14
+QC2MON01.15.mapped.sorted.concordant	QC2MON01.15	Deux-Montagnes	45,53234	-73,89163	nigrum	2022-09-14
+QCANLA01.02.mapped.sorted.concordant	QCANLA01.02	Sainte-Anne-du-Lac	46,77	-75,46099	saccharum	2018-06-27
+QCANLA01.03.mapped.sorted.concordant	QCANLA01.03	Sainte-Anne-du-Lac	46,77	-75,46099	saccharum	2018-06-27
+QCANLA01.04.mapped.sorted.concordant	QCANLA01.04	Sainte-Anne-du-Lac	46,77	-75,46099	saccharum	2018-06-27
+QCANLA01.05.mapped.sorted.concordant	QCANLA01.05	Sainte-Anne-du-Lac	46,77	-75,46099	saccharum	2018-06-27
+QCFJSA02.04.mapped.sorted.concordant	QCFJSA02.04	Fjord-Saguenay	48,1327987	-70,07827758	saccharum	2018-07-28
+QCFJSA02.05.mapped.sorted.concordant	QCFJSA02.05	Fjord-Saguenay	48,1327987	-70,07827758	saccharum	2018-07-28
+QCFJSA02.06.mapped.sorted.concordant	QCFJSA02.06	Fjord-Saguenay	48,1327987	-70,07827758	saccharum	2018-07-28
+QCFJSA02.07.mapped.sorted.concordant	QCFJSA02.07	Fjord-Saguenay	48,1327987	-70,07827758	saccharum	2018-07-28
+QCPAPI01.01B.mapped.sorted.concordant	QCPAPI01.01B	Fasset 1	45,68242	-74,854333	nigrum	#N/A
+QCPAPI01.02B.mapped.sorted.concordant	QCPAPI01.02B	Fasset 1	45,682273	-74,854429	nigrum	#N/A
+QCPAPI01.03B.mapped.sorted.concordant	QCPAPI01.03B	Fasset 1	45,682046	-74,854468	nigrum	#N/A
+QCPAPI01.04B.mapped.sorted.concordant	QCPAPI01.04B	Fasset 1	45,681846	-74,854558	nigrum	#N/A
+QCPAPI01.05B.mapped.sorted.concordant	QCPAPI01.05B	Fasset 1	45,68175	-74,85476	nigrum	#N/A
+QCPAPI01.06.mapped.sorted.concordant	QCPAPI01.06	Fasset 1	45,681641	-74,854538	nigrum	2021-06-22
+QCPAPI01.07.mapped.sorted.concordant	QCPAPI01.07	Fasset 1	45,681546	-74,854329	nigrum	2021-06-22
+QCPAPI01.08.mapped.sorted.concordant	QCPAPI01.08	Fasset 1	45,681917	-74,85426	nigrum	2021-06-22
+QCPAPI01.09.mapped.sorted.concordant	QCPAPI01.09	Fasset 1	45,681951	-74,854093	nigrum	2021-06-22
+QCPAPI01.10.mapped.sorted.concordant	QCPAPI01.10	Fasset 1	45,682189	-74,853936	nigrum	2021-06-22
+QCPAPI01.11.mapped.sorted.concordant	QCPAPI01.11	Fasset 1	45,682396	-74,853983	nigrum	2021-06-22
+QCPAPI01.12.mapped.sorted.concordant	QCPAPI01.12	Fasset 1	45,682762	-74,853894	nigrum	2021-06-22
+QCPAPI01.13.mapped.sorted.concordant	QCPAPI01.13	Fasset 1	45,682974	-74,853723	nigrum	2021-06-22
+QCPAPI01.14.mapped.sorted.concordant	QCPAPI01.14	Fasset 1	45,683185	-74,853796	nigrum	2021-06-22
+QCPAPI01.15.mapped.sorted.concordant	QCPAPI01.15	Fasset 1	45,683515	-74,853803	nigrum	2021-06-22
+QCPAPI01.16.mapped.sorted.concordant	QCPAPI01.16	Fasset 1	45,683691	-74,85347	nigrum	2021-06-22
+QCPAPI01.17.mapped.sorted.concordant	QCPAPI01.17	Fasset 1	45,683329	-74,853888	nigrum	2021-06-22
+QCPAPI01.18.mapped.sorted.concordant	QCPAPI01.18	Fasset 1	45,683071	-74,853956	nigrum	2021-06-22
+QCPAPI01.19.mapped.sorted.concordant	QCPAPI01.19	Fasset 1	45,682884	-74,854097	nigrum	2021-06-22
+QCPAPI01.20.mapped.sorted.concordant	QCPAPI01.20	Fasset 1	45,68259	-74,854343	nigrum	2021-06-22
+QCPAPI02.01.mapped.sorted.concordant	QCPAPI02.01	Fasset 2	45,682726	-74,85281	saccharum	2021-06-22
+QCPAPI02.02.mapped.sorted.concordant	QCPAPI02.02	Fasset 2	45,682897	-74,852691	saccharum	2021-06-22
+QCPAPI02.03.mapped.sorted.concordant	QCPAPI02.03	Fasset 2	45,683167	-74,852561	saccharum	2021-06-22
+QCPAPI02.04.mapped.sorted.concordant	QCPAPI02.04	Fasset 2	45,683274	-74,852387	saccharum	2021-06-22
+QCPAPI02.05.mapped.sorted.concordant	QCPAPI02.05	Fasset 2	45,682913	-74,852258	saccharum	2021-06-22
+QCPAPI02.06.mapped.sorted.concordant	QCPAPI02.06	Fasset 2	45,682521	-74,852389	saccharum	2021-06-22
+QCPAPI02.07.mapped.sorted.concordant	QCPAPI02.07	Fasset 2	45,682425	-74,852213	saccharum	2021-06-22
+QCPAPI02.08.mapped.sorted.concordant	QCPAPI02.08	Fasset 2	45,682945	-74,851855	saccharum	2021-06-22
+QCPAPI02.09.mapped.sorted.concordant	QCPAPI02.09	Fasset 2	45,683069	-74,851678	saccharum	2021-06-22
+QCPAPI02.10.mapped.sorted.concordant	QCPAPI02.10	Fasset 2	45,683606	-74,852043	saccharum	2021-06-22
+QCPAPI02.11.mapped.sorted.concordant	QCPAPI02.11	Fasset 2	45,683598	-74,852283	saccharum	2021-06-22
+QCPAPI02.12.mapped.sorted.concordant	QCPAPI02.12	Fasset 2	45,683755	-74,852122	saccharum	2021-06-22
+QCPAPI02.13.mapped.sorted.concordant	QCPAPI02.13	Fasset 2	45,683859	-74,85198	saccharum	2021-06-22
+QCPAPI02.14.mapped.sorted.concordant	QCPAPI02.14	Fasset 2	45,684196	-74,851805	saccharum	2021-06-22
+QCPAPI02.15.mapped.sorted.concordant	QCPAPI02.15	Fasset 2	45,684298	-74,851609	saccharum	2021-06-22
+QCPAPI02.16.mapped.sorted.concordant	QCPAPI02.16	Fasset 2	45,68451	-74,851465	saccharum	2021-06-22
+QCPAPI02.17.mapped.sorted.concordant	QCPAPI02.17	Fasset 2	45,681925	-74,852794	saccharum	2021-06-22
+QCPAPI02.18.mapped.sorted.concordant	QCPAPI02.18	Fasset 2	45,681526	-74,852971	saccharum	2021-06-22
+QCPAPI02.19.mapped.sorted.concordant	QCPAPI02.19	Fasset 2	45,681604	-74,853246	saccharum	2021-06-22
+QCPAPI02.20.mapped.sorted.concordant	QCPAPI02.20	Fasset 2	45,681337	-74,853319	saccharum	2021-06-22
+QCPAPI03.01.mapped.sorted.concordant	QCPAPI03.01	Fasset 3	45,680555	-74,854887	saccharum	2021-06-23
+QCPAPI03.02.mapped.sorted.concordant	QCPAPI03.02	Fasset 3	45,680448	-74,854639	saccharum	2021-06-23
+QCPAPI03.03.mapped.sorted.concordant	QCPAPI03.03	Fasset 3	45,680394	-74,854453	saccharum	2021-06-23
+QCPAPI03.04.mapped.sorted.concordant	QCPAPI03.04	Fasset 3	45,680416	-74,854237	saccharum	2021-06-23
+QCPAPI03.05.mapped.sorted.concordant	QCPAPI03.05	Fasset 3	45,680661	-74,854198	saccharum	2021-06-23
+QCPAPI03.06.mapped.sorted.concordant	QCPAPI03.06	Fasset 3	45,680805	-74,854187	saccharum	2021-06-23
+QCPAPI03.07.mapped.sorted.concordant	QCPAPI03.07	Fasset 3	45,680994	-74,855202	saccharum	2021-06-23
+QCPAPI03.08.mapped.sorted.concordant	QCPAPI03.08	Fasset 3	45,680837	-74,855316	saccharum	2021-06-23
+QCPAPI03.09.mapped.sorted.concordant	QCPAPI03.09	Fasset 3	45,680687	-74,855357	saccharum	2021-06-23
+QCPAPI03.10.mapped.sorted.concordant	QCPAPI03.10	Fasset 3	45,680544	-74,855485	saccharum	2021-06-23
+QCPAPI03.11.mapped.sorted.concordant	QCPAPI03.11	Fasset 3	45,680381	-74,854847	saccharum	2021-06-23
+QCPAPI03.12.mapped.sorted.concordant	QCPAPI03.12	Fasset 3	45,680289	-74,854668	saccharum	2021-06-23
+QCPAPI03.13.mapped.sorted.concordant	QCPAPI03.13	Fasset 3	45,680212	-74,854515	saccharum	2021-06-23
+QCPAPI03.14.mapped.sorted.concordant	QCPAPI03.14	Fasset 3	45,680076	-74,854616	saccharum	2021-06-23
+QCPAPI03.15.mapped.sorted.concordant	QCPAPI03.15	Fasset 3	45,680133	-74,854801	saccharum	2021-06-23
+QCPAPI03.16.mapped.sorted.concordant	QCPAPI03.16	Fasset 3	45,680267	-74,855003	saccharum	2021-06-23
+QCPAPI03.17.mapped.sorted.concordant	QCPAPI03.17	Fasset 3	45,680373	-74,855284	saccharum	2021-06-23
+QCPAPI03.18.mapped.sorted.concordant	QCPAPI03.18	Fasset 3	45,680256	-74,85515	saccharum	2021-06-23
+QCPAPI03.19.mapped.sorted.concordant	QCPAPI03.19	Fasset 3	45,680053	-74,855031	saccharum	2021-06-23
+QCPAPI03.20.mapped.sorted.concordant	QCPAPI03.20	Fasset 3	45,679981	-74,854736	saccharum	2021-06-23
+QCPAPI04.01.mapped.sorted.concordant	QCPAPI04.01	Fasset 4	45,675673	-74,858674	nigrum	2021-06-23
+QCPAPI04.02.mapped.sorted.concordant	QCPAPI04.02	Fasset 4	45,675709	-74,858531	nigrum	2021-06-23
+QCPAPI04.03.mapped.sorted.concordant	QCPAPI04.03	Fasset 4	45,675799	-74,858369	nigrum	2021-06-23
+QCPAPI04.04.mapped.sorted.concordant	QCPAPI04.04	Fasset 4	45,675928	-74,85846	nigrum	2021-06-23
+QCPAPI04.05.mapped.sorted.concordant	QCPAPI04.05	Fasset 4	45,676159	-74,858311	nigrum	2021-06-23
+QCPAPI04.06.mapped.sorted.concordant	QCPAPI04.06	Fasset 4	45,676027	-74,858122	nigrum	2021-06-23
+QCPAPI04.07.mapped.sorted.concordant	QCPAPI04.07	Fasset 4	45,676226	-74,858004	nigrum	2021-06-23
+QCPAPI04.08.mapped.sorted.concordant	QCPAPI04.08	Fasset 4	45,676135	-74,858058	nigrum	2021-06-23
+QCPAPI04.09.mapped.sorted.concordant	QCPAPI04.09	Fasset 4	45,675792	-74,858077	nigrum	2021-06-23
+QCPAPI04.10.mapped.sorted.concordant	QCPAPI04.10	Fasset 4	45,675646	-74,85814	nigrum	2021-06-23
+QCPAPI04.11.mapped.sorted.concordant	QCPAPI04.11	Fasset 4	45,676609	-74,857846	nigrum	2021-06-23
+QCPAPI04.12.mapped.sorted.concordant	QCPAPI04.12	Fasset 4	45,676702	-74,85792	nigrum	2021-06-23
+QCPAPI04.13.mapped.sorted.concordant	QCPAPI04.13	Fasset 4	45,67686	-74,857978	nigrum	2021-06-23
+QCPAPI04.14.mapped.sorted.concordant	QCPAPI04.14	Fasset 4	45,676842	-74,857721	nigrum	2021-06-23
+QCPAPI04.15.mapped.sorted.concordant	QCPAPI04.15	Fasset 4	45,677092	-74,857425	nigrum	2021-06-23
+QCPAPI04.16.mapped.sorted.concordant	QCPAPI04.16	Fasset 4	45,67702	-74,8571	nigrum	2021-06-23
+QCPAPI04.17.mapped.sorted.concordant	QCPAPI04.17	Fasset 4	45,677093	-74,857254	nigrum	2021-06-23
+QCPAPI04.18.mapped.sorted.concordant	QCPAPI04.18	Fasset 4	45,677623	-74,857125	nigrum	2021-06-23
+QCPAPI04.19.mapped.sorted.concordant	QCPAPI04.19	Fasset 4	45,677468	-74,857297	nigrum	2021-06-23
+QCPAPI04.20.mapped.sorted.concordant	QCPAPI04.20	Fasset 4	45,677343	-74,857451	nigrum	2021-06-23
+QCPAPI05.01B.mapped.sorted.concordant	QCPAPI05.01B	Fasset 5	45,674782	-74,857652	saccharum	#N/A
+QCPAPI05.02B.mapped.sorted.concordant	QCPAPI05.02B	Fasset 5	45,674661	-74,857715	saccharum	#N/A
+QCPAPI05.03B.mapped.sorted.concordant	QCPAPI05.03B	Fasset 5	45,67477	-74,857962	saccharum	#N/A
+QCPAPI05.04.mapped.sorted.concordant	QCPAPI05.04	Fasset 5	45,674661	-74,858216	saccharum	2021-07-02
+QCPAPI05.05.mapped.sorted.concordant	QCPAPI05.05	Fasset 5	45,674564	-74,858644	saccharum	2021-07-02
+QCPAPI05.06.mapped.sorted.concordant	QCPAPI05.06	Fasset 5	45,674681	-74,858754	saccharum	2021-07-02
+QCPAPI05.07.mapped.sorted.concordant	QCPAPI05.07	Fasset 5	45,674573	-74,858908	saccharum	2021-07-02
+QCPAPI05.08.mapped.sorted.concordant	QCPAPI05.08	Fasset 5	45,674748	-74,859023	saccharum	2021-07-02
+QCPAPI05.09.mapped.sorted.concordant	QCPAPI05.09	Fasset 5	45,674512	-74,859118	saccharum	2021-07-02
+QCPAPI05.10.mapped.sorted.concordant	QCPAPI05.10	Fasset 5	45,674642	-74,859228	saccharum	2021-07-02
+QCPAPI05.11.mapped.sorted.concordant	QCPAPI05.11	Fasset 5	45,674691	-74,859452	saccharum	2021-07-02
+QCPAPI05.12.mapped.sorted.concordant	QCPAPI05.12	Fasset 5	45,674525	-74,859509	saccharum	2021-07-02
+QCPAPI05.13.mapped.sorted.concordant	QCPAPI05.13	Fasset 5	45,674332	-74,859513	saccharum	2021-07-02
+QCPAPI05.14.mapped.sorted.concordant	QCPAPI05.14	Fasset 5	45,674247	-74,859237	saccharum	2021-07-02
+QCPAPI05.15.mapped.sorted.concordant	QCPAPI05.15	Fasset 5	45,674269	-74,858939	saccharum	2021-07-02
+QCPAPI05.16.mapped.sorted.concordant	QCPAPI05.16	Fasset 5	45,674285	-74,858632	saccharum	2021-07-02
+QCPAPI05.17.mapped.sorted.concordant	QCPAPI05.17	Fasset 5	45,674215	-74,858362	saccharum	2021-07-02
+QCPAPI05.18.mapped.sorted.concordant	QCPAPI05.18	Fasset 5	45,674308	-74,85814	saccharum	2021-07-02
+QCPAPI05.19.mapped.sorted.concordant	QCPAPI05.19	Fasset 5	45,674331	-74,85777	saccharum	2021-07-02
+QCPAPI05.20.mapped.sorted.concordant	QCPAPI05.20	Fasset 5	45,674526	-74,858036	saccharum	2021-07-02
+QCPAPI06.01.mapped.sorted.concordant	QCPAPI06.01	Fasset 6	45,675518	-74,856899	saccharum	2021-07-02
+QCPAPI06.02.mapped.sorted.concordant	QCPAPI06.02	Fasset 6	45,675639	-74,856624	saccharum	2021-07-02
+QCPAPI06.03.mapped.sorted.concordant	QCPAPI06.03	Fasset 6	45,675894	-74,856475	saccharum	2021-07-02
+QCPAPI06.04.mapped.sorted.concordant	QCPAPI06.04	Fasset 6	45,675961	-74,856261	saccharum	2021-07-02
+QCPAPI06.05.mapped.sorted.concordant	QCPAPI06.05	Fasset 6	45,676122	-74,856166	saccharum	2021-07-02
+QCPAPI06.06.mapped.sorted.concordant	QCPAPI06.06	Fasset 6	45,676324	-74,856069	saccharum	2021-07-02
+QCPAPI06.07.mapped.sorted.concordant	QCPAPI06.07	Fasset 6	45,676508	-74,856021	saccharum	2021-07-02
+QCPAPI06.08.mapped.sorted.concordant	QCPAPI06.08	Fasset 6	45,676668	-74,855888	saccharum	2021-07-02
+QCPAPI06.09.mapped.sorted.concordant	QCPAPI06.09	Fasset 6	45,676928	-74,855742	saccharum	2021-07-02
+QCPAPI06.11.mapped.sorted.concordant	QCPAPI06.11	Fasset 6	45,677033	-74,855316	saccharum	2021-07-02
+QCPAPI06.12.mapped.sorted.concordant	QCPAPI06.12	Fasset 6	45,676885	-74,855532	saccharum	2021-07-02
+QCPAPI06.13.mapped.sorted.concordant	QCPAPI06.13	Fasset 6	45,676744	-74,855752	saccharum	2021-07-02
+QCPAPI06.14.mapped.sorted.concordant	QCPAPI06.14	Fasset 6	45,676434	-74,855779	saccharum	2021-07-02
+QCPAPI06.15.mapped.sorted.concordant	QCPAPI06.15	Fasset 6	45,676163	-74,856029	saccharum	2021-07-02
+QCPAPI06.16.mapped.sorted.concordant	QCPAPI06.16	Fasset 6	45,675952	-74,855897	saccharum	2021-07-02
+QCPAPI06.17.mapped.sorted.concordant	QCPAPI06.17	Fasset 6	45,675679	-74,856012	saccharum	2021-07-02
+QCPAPI06.18.mapped.sorted.concordant	QCPAPI06.18	Fasset 6	45,675448	-74,856253	saccharum	2021-07-02
+QCPAPI06.19.mapped.sorted.concordant	QCPAPI06.19	Fasset 6	45,675234	-74,856445	saccharum	2021-07-02
+QCPAPI06.20.mapped.sorted.concordant	QCPAPI06.20	Fasset 6	45,675077	-74,856789	saccharum	2021-07-02
